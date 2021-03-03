@@ -1,8 +1,6 @@
 package com.produto.controller;
 
 import java.util.List;
-import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import com.produto.model.Produto;
+import com.produto.model.StatusProduto;
 import com.produto.service.ProdutoService;
 
 @RestController
@@ -39,7 +38,7 @@ public class ProdutoController {
 	}
 	
 	@GetMapping("/produtos/{cod}")
-	public @ResponseBody Optional<Produto> getIdProdutos(@PathVariable Long cod) {
+	public @ResponseBody Produto getIdProdutos(@PathVariable Long cod) {
 		return produtoService.listarIdProduto(cod);
 	}
 	
@@ -49,9 +48,18 @@ public class ProdutoController {
 	}
 		
 	@DeleteMapping("/produtos/{cod}")
-	public @ResponseBody Produto deleteProdutos(@PathVariable Long cod) {
-		Optional<Produto> produto = getIdProdutos(cod);
-		return produtoService.deletarProduto(produto);
+	public @ResponseBody StatusProduto deleteProduto(@PathVariable Long cod) {
+		StatusProduto statusProduto = new StatusProduto();
+		
+		try {
+			Produto produto = getIdProdutos(cod);
+			this.produtoService.deletarProduto(produto);
+			statusProduto.setStatus("pacote removido com sucesso");
+		} catch (Exception erro) {
+			statusProduto.setStatus("falha na remoção do pacote - "+erro.getMessage() );
+		}
+		return statusProduto;
 	}
+
 
 }
